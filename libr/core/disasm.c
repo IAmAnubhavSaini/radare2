@@ -5882,9 +5882,14 @@ toro:
 }
 
 static inline bool check_end(int nb_opcodes, int nb_bytes, int i, int j) {
+	const int maxinstrsz = 32;
 	if (nb_opcodes > 0) {
 		if (nb_bytes > 0) {
-			return j < nb_opcodes && i < nb_bytes;
+			if (nb_bytes < maxinstrsz) {
+				// XXX if bbsize <32 expect invalid in disasm
+				return j < nb_opcodes && i < nb_bytes;
+			}
+			return j < nb_opcodes && i + maxinstrsz < nb_bytes;
 		}
 		return j < nb_opcodes;
 	}
